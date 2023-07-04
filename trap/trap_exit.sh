@@ -5,7 +5,7 @@ set -eu
 _tmp_file=$(mktemp)
 
 # trap caught exit/error and remove tmp file.
-cleanup() {
+function cleanup() {
   if [[ -f "${_tmp_file}" ]]; then
     rm "${_tmp_file}"
   fi
