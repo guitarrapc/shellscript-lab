@@ -24,7 +24,30 @@ More information: <https://manned.org/trap>.
   trap - SIGHUP SIGINT
 ```
 
-# expression or function call
+# TIPS
+
+## unbound variable can't caught by trap
+
+Workaround, use `EXIT` instead of `ERR` to caught unbound variable.
+
+```sh
+#!/bin/bash
+set -eu
+
+# declare before trap
+_tmp_file=$(mktemp)
+
+# trap caught exit/error and remove tmp file.
+function cleanup() {
+  foo=foobar
+  echo "$foo"
+}
+trap cleanup ERR # bad. use EXIT instead of ERR
+
+echo "${foo}" # unbound variable won't catch error. see https://unix.stackexchange.com/questions/208112/correct-behavior-of-exit-and-err-traps-when-using-set-eu
+```
+
+## expression or function call
 
 function call is better to handle multiple line of execution. Below examples are equivalent and will output the tmp file like `file: /tmp/tmp.IQga703pbI`.
 
