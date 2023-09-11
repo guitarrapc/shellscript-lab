@@ -53,11 +53,13 @@ EOF
 )
 
 if [[ "${_DRY_RUN:=""}" == "" ]]; then
-  curl -sS -X POST "https://api.datadoghq.com/api/v1/series" \
+  curl -sSf -X POST "https://api.datadoghq.com/api/v1/series" \
   -H "Accept: application/json" \
   -H "Content-Type: text/json" \
   -H "DD-API-KEY: ${_DD_API_KEY}" \
   -d "${body}"
+  # add blank line
+  echo
 else
   echo "curl -sS -X POST \"https://api.datadoghq.com/api/v1/series\" \
   -H \"Accept: application/json\" \
