@@ -6,16 +6,16 @@ set -eu -o pipefail
 #
 # REF: https://docs.datadoghq.com/api/latest/metrics/#submit-metrics
 #
-# SAMPLE: ./dd_metrics_api.sh --dd-api-key xxxx --metrics-name foo --metrics-value 1 --metrics-tags "env:bar,app:baz"
+# SAMPLE: ./dd_metrics_api.sh --dd-api-key xxxx --metric-name foo --metric-value 1 --metric-tags "env:bar,app:baz"
 
 while [ $# -gt 0 ]; do
     case $1 in
         --dd-api-key) _DD_API_KEY=$2; shift 2; ;;
         # gauge, rate, count
-        --metrics-type) _METRICS_TYPE=$2; shift 2; ;;
-        --metrics-name) _METRICS_NAME=$2; shift 2; ;;
-        --metrics-value) _METRICS_VALUE=$2; shift 2; ;;
-        --metrics-tags) _TAGS=$2; shift 2; ;;
+        --metric-type) _METRIC_TYPE=$2; shift 2; ;;
+        --metric-name) _METRIC_NAME=$2; shift 2; ;;
+        --metric-value) _METRIC_VALUE=$2; shift 2; ;;
+        --metric-tags) _METRIC_TAGS=$2; shift 2; ;;
         --dry-run) _DRY_RUN=$2; shift 2; ;;
         *) shift ;;
     esac
@@ -31,20 +31,20 @@ function join_by {
 }
 
 # generate `"a,b" -> a","b`
-tag_array=("${_TAGS//,/ }")
+tag_array=("${_METRIC_TAGS//,/ }")
 tags=$(join_by '","' ${tag_array})
 
 # generate metrics points `1694402473 10 -> 1694402473,10`
-points=$(join_by ',' $(date +%s) ${_METRICS_VALUE})
+points=$(join_by ',' $(date +%s) ${_METRIC_VALUE})
 
 # generate request body
 body=$(cat <<EOF
 {
   "series": [
     {
-      "metric": "${_METRICS_NAME}",
+      "metric": "${_METRIC_NAME}",
       "points": [[${points}]],
-      "type": "${_METRICS_TYPE:=gauge}",
+      "type": "${_METRIC_TYPE:=gauge}",
       "tags": ["${tags}"]
     }
   ]
