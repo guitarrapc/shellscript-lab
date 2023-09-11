@@ -30,12 +30,12 @@ function join_by {
   fi
 }
 
-# generate `"a,b" -> a","b`
+# generate `"a,b" -> a","b`, then quote  -> "a","b"
 tag_array=("${_METRIC_TAGS//,/ }")
-tags=$(join_by '","' ${tag_array})
+tags=$(printf '"%s"' $(join_by '","' ${tag_array}))
 
 # generate metrics points `1694402473 10 -> 1694402473,10`
-points=$(join_by ',' $(date +%s) ${_METRIC_VALUE})
+points=$(join_by ',' "$(date +%s)" "${_METRIC_VALUE}")
 
 # generate request body
 body=$(cat <<EOF
@@ -45,7 +45,7 @@ body=$(cat <<EOF
       "metric": "${_METRIC_NAME}",
       "points": [[${points}]],
       "type": "${_METRIC_TYPE:=gauge}",
-      "tags": ["${tags}"]
+      "tags": [${tags}]
     }
   ]
 }
